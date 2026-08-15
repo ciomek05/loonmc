@@ -1,0 +1,18 @@
+{
+  "required": true,
+  "package": "ciomek.loon.mixin",
+  "compatibilityLevel": "JAVA_${java}",
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "mixins": [
+    "ContainerInventoryMQTTMixin",
+    "EntityItemMQTTMixin",
+    "PacketHandlerServerMQTTMixin",
+    "PlayerListMQTTMixin",
+    "PlayerMQTTMixin",
+    "WorldServerMixin"
+  ],
+  "client": []
+}
+
