@@ -19,6 +19,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public record ChunkMapRequest(int xStart, int xEnd, int zStart, int zEnd) implements IRequest {
+	private static final boolean REQUIRE_TICK_THREAD = false;
+
 	@Override
 	public void handle(MinecraftServer server) {
 		World world = server.getDimensionWorld(0);
@@ -72,10 +74,11 @@ public record ChunkMapRequest(int xStart, int xEnd, int zStart, int zEnd) implem
 
 	Chunk resolveChunk(World world, ChunkProvider provider, ChunkLoader loader, int x, int z)
 	{
-		ChunkPos chunkPos = new ChunkPos(x, z);
-
-		if (provider.isChunkLoaded(chunkPos))
-			return world.getChunk(chunkPos);
+		if (REQUIRE_TICK_THREAD) {
+			ChunkPos chunkPos = new ChunkPos(x, z);
+			if (provider.isChunkLoaded(chunkPos))
+				return world.getChunk(chunkPos);
+		}
 
 		if (loader == null || !loader.chunkExists(world, x, z))
 			return null;
@@ -85,5 +88,11 @@ public record ChunkMapRequest(int xStart, int xEnd, int zStart, int zEnd) implem
 		} catch (IOException e) {
 			return null;
 		}
+	}
+
+	@Override
+	public boolean requireTickThread()
+	{
+		return REQUIRE_TICK_THREAD;
 	}
 }

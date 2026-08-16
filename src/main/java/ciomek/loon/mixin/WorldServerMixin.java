@@ -105,13 +105,20 @@ public class WorldServerMixin {
 		IRequest request;
 		while ((request = RequestManager.pollRequest()) != null) {
 			IRequest current = request;
-			EXECUTOR.submit(() -> {
-				try {
-					current.handle(mcServer);
-				} catch (Exception e) {
-					Loon.LOGGER.error("Failed to handle request: {}, {}", current.getClass().getSimpleName(), e);
-				}
-			});
+			if (current.requireTickThread()) {
+				runRequest(current);
+			} else {
+				EXECUTOR.submit(() -> runRequest(current));
+			}
+		}
+	}
+
+	@Unique
+	private void runRequest(IRequest request) {
+		try {
+			request.handle(mcServer);
+		} catch (Exception e) {
+			Loon.LOGGER.error("Failed to handle request: {}, {}", request.getClass().getSimpleName(), e);
 		}
 	}
 }
