@@ -1,5 +1,6 @@
 package ciomek.loon.mixin;
 
+import ciomek.loon.Loon;
 import ciomek.loon.TPSTracker;
 import ciomek.loon.mqtt.payload.data.PlayerIdentity;
 import ciomek.loon.mqtt.payload.data.PositionData;
@@ -51,31 +52,9 @@ public class WorldServerMixin {
 
 	@Inject(method = "tick", at = @At("TAIL"))
 	private void onTick(CallbackInfo ci) {
-		WorldServer self = (WorldServer) (Object) this;
-		if (self.dimension == Dimension.OVERWORLD) {
-			long now = System.nanoTime();
-			if (lastTickNanos != 0) {
-				gapSumNanos += now - lastTickNanos;
-				gapTicks++;
-				if (gapSumNanos >= 1_000_000_000L) {
-					TPSTracker.setTPS(Math.min(20.0, gapTicks / (gapSumNanos / 1e9)));
-					gapSumNanos = 0;
-					gapTicks = 0;
-				}
-			}
-			lastTickNanos = now;
-
-			if (++positionCheckTicks >= POSITION_CHECK_INTERVAL_TICKS) {
-				positionCheckTicks = 0;
-				broadcastMovedPlayerPositions();
-			}
-		}
-
-		IRequest request;
-		while ((request = RequestManager.pollRequest()) != null) {
-			IRequest current = request;
-			EXECUTOR.submit(() -> current.handle(mcServer));
-		}
+		countTicks();
+		positionCountdown();
+		handleRequests();
 	}
 
 	@Unique
@@ -92,6 +71,47 @@ public class WorldServerMixin {
 
 				payload.send();
 			}
+		}
+	}
+
+	@Unique private void countTicks()
+	{
+		WorldServer self = (WorldServer) (Object) this;
+		if (self.dimension == Dimension.OVERWORLD) {
+			long now = System.nanoTime();
+			if (lastTickNanos != 0) {
+				gapSumNanos += now - lastTickNanos;
+				gapTicks++;
+				if (gapSumNanos >= 1_000_000_000L) {
+					TPSTracker.setTPS(Math.min(20.0, gapTicks / (gapSumNanos / 1e9)));
+					gapSumNanos = 0;
+					gapTicks = 0;
+				}
+			}
+			lastTickNanos = now;
+		}
+	}
+
+	@Unique private void positionCountdown()
+	{
+		if (++positionCheckTicks >= POSITION_CHECK_INTERVAL_TICKS) {
+			positionCheckTicks = 0;
+			broadcastMovedPlayerPositions();
+		}
+	}
+
+	@Unique private void handleRequests()
+	{
+		IRequest request;
+		while ((request = RequestManager.pollRequest()) != null) {
+			IRequest current = request;
+			EXECUTOR.submit(() -> {
+				try {
+					current.handle(mcServer);
+				} catch (Exception e) {
+					Loon.LOGGER.error("Failed to handle request: {}, {}", current.getClass().getSimpleName(), e);
+				}
+			});
 		}
 	}
 }
