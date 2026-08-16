@@ -74,11 +74,31 @@ public class MQTTClient {
 			options.setUserName(username);
 			options.setPassword(password.toCharArray());
 			options.setMaxInflight(10000);
+			options.setAutomaticReconnect(true);
 
-			client.setCallback(new MqttCallback() {
+			client.setCallback(new MqttCallbackExtended() {
+				@Override
+				public void connectComplete(boolean reconnect, String serverURI) {
+					try {
+						client.subscribe("loon/player/+/inventory/full/request");
+						client.subscribe("loon/player/+/online/request");
+						client.subscribe("loon/player/+/position/request");
+						client.subscribe("loon/world/chunks/+/+/request");
+						client.subscribe("loon/server/info/request");
+
+						if (reconnect)
+							Loon.LOGGER.info("MQTT reconnected");
+						else
+							Loon.LOGGER.info("MQTT connected");
+
+					} catch (MqttException e) {
+						throw new RuntimeException(e);
+					}
+				}
+
 				@Override
 				public void connectionLost(Throwable cause) {
-
+					Loon.LOGGER.warn("MQTT connection lost, reconnecting...", cause);
 				}
 
 				@Override
@@ -149,11 +169,6 @@ public class MQTTClient {
 			});
 
 			client.connect(options);
-			client.subscribe("loon/player/+/inventory/full/request");
-			client.subscribe("loon/player/+/online/request");
-			client.subscribe("loon/player/+/position/request");
-			client.subscribe("loon/world/chunks/+/+/request");
-			client.subscribe("loon/server/info/request");
 		} catch (MqttException e) {
 			throw new RuntimeException(e);
 		}
