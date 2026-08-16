@@ -2,10 +2,10 @@
 	"schemaVersion": 1,
 	"id": "loon",
 	"version": "${version}",
-	"name": "Example Mod",
-	"description": "This mod aims to help new BTA modders.",
+	"name": "loonmc",
+	"description": "Mod that sends data to MQTT server.",
 	"authors": [
-		"Turnip Labs"
+		"ciomek"
 	],
 	"contact": {
 		"homepage": "",
