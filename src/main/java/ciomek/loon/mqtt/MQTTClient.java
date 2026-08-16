@@ -108,11 +108,11 @@ public class MQTTClient {
 						Matcher matcher = pattern.matcher(topic);
 
 						if (matcher.matches()) {
-							UUID playerId = UUID.fromString(matcher.group(1));
+							UUID playerId = parsePlayerUuid(matcher.group(1));
+							if (playerId == null)
+								return;
 
-							InventoryRequest inventoryRequest = new InventoryRequest(playerId);
-
-							RequestManager.addRequest(inventoryRequest);
+							RequestManager.addRequest(new InventoryRequest(playerId));
 						}
 					}
 
@@ -121,11 +121,11 @@ public class MQTTClient {
 						Matcher matcher = pattern.matcher(topic);
 
 						if (matcher.matches()) {
-							UUID playerId = UUID.fromString(matcher.group(1));
+							UUID playerId = parsePlayerUuid(matcher.group(1));
+							if (playerId == null)
+								return;
 
-							PlayerOnlineRequest playerOnlineRequest = new PlayerOnlineRequest(playerId);
-
-							RequestManager.addRequest(playerOnlineRequest);
+							RequestManager.addRequest(new PlayerOnlineRequest(playerId));
 						}
 					}
 
@@ -134,11 +134,11 @@ public class MQTTClient {
 						Matcher matcher = pattern.matcher(topic);
 
 						if (matcher.matches()) {
-							UUID playerId = UUID.fromString(matcher.group(1));
+							UUID playerId = parsePlayerUuid(matcher.group(1));
+							if (playerId == null)
+								return;
 
-							PlayerPositionRequest request = new PlayerPositionRequest(playerId);
-
-							RequestManager.addRequest(request);
+							RequestManager.addRequest(new PlayerPositionRequest(playerId));
 						}
 					}
 
@@ -171,6 +171,15 @@ public class MQTTClient {
 			client.connect(options);
 		} catch (MqttException e) {
 			throw new RuntimeException(e);
+		}
+	}
+
+	private static UUID parsePlayerUuid(String raw) {
+		try {
+			return UUID.fromString(raw);
+		} catch (IllegalArgumentException e) {
+			Loon.LOGGER.warn("Ignoring MQTT request with invalid player UUID: {}", raw);
+			return null;
 		}
 	}
 }
