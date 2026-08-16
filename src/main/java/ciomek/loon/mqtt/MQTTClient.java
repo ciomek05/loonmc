@@ -147,14 +147,21 @@ public class MQTTClient {
 
 					if (matcher.matches())
 					{
-						int xStart = Integer.parseInt(matcher.group(1));
-						int xEnd = Integer.parseInt(matcher.group(2));
-						int zStart = Integer.parseInt(matcher.group(3));
-						int zEnd = Integer.parseInt(matcher.group(4));
+						try
+						{
+							int xStart = Integer.parseInt(matcher.group(1));
+							int xEnd = Integer.parseInt(matcher.group(2));
+							int zStart = Integer.parseInt(matcher.group(3));
+							int zEnd = Integer.parseInt(matcher.group(4));
 
-						ChunkMapRequest request = new ChunkMapRequest(xStart, xEnd, zStart, zEnd);
+							ChunkMapRequest request = new ChunkMapRequest(xStart, xEnd, zStart, zEnd);
 
-						RequestManager.addRequest(request);
+							RequestManager.addRequest(request);
+						}
+						catch (NumberFormatException e)
+						{
+							
+						}
 					}
 
 					if (topic.equals("loon/server/info/request")) {
