@@ -3,6 +3,7 @@ package ciomek.loon.commands;
 import ciomek.loon.mqtt.MQTTClient;
 import ciomek.loon.mqtt.payload.ChangePasswordPayload;
 import ciomek.loon.mqtt.payload.RegisterResponse;
+import ciomek.loon.utils.PasswordHasher;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.ArgumentTypeString;
@@ -34,7 +35,9 @@ public class ChangePasswordCommand implements CommandManager.CommandRegistry {
 
 								String password = ArgumentTypeString.getString(context, "password");
 
-								ChangePasswordPayload payload = new ChangePasswordPayload(player.uuid.toString(), password);
+								String hashedPassword = PasswordHasher.hash(password);
+
+								ChangePasswordPayload payload = new ChangePasswordPayload(player.uuid.toString(), hashedPassword);
 
 								MQTTClient.getInstance().publish(payload.topics().get(0), payload.toJson());
 

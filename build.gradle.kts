@@ -58,13 +58,16 @@ dependencies {
 
 	// MQTT
 	implementation("org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.2.5")
-	include("org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.2.5")
+	implementation("org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.2.5")
 
 	// JSON
 	implementation("com.fasterxml.jackson.core:jackson-databind:2.20.0")
-	include("com.fasterxml.jackson.core:jackson-databind:2.20.0")
-	include("com.fasterxml.jackson.core:jackson-core:2.20.0")
-	include("com.fasterxml.jackson.core:jackson-annotations:2.20")
+	implementation("com.fasterxml.jackson.core:jackson-databind:2.20.0")
+	implementation("com.fasterxml.jackson.core:jackson-core:2.20.0")
+	implementation("com.fasterxml.jackson.core:jackson-annotations:2.20")
+
+	// Hashing
+	implementation("de.mkammerer:argon2-jvm:2.12")
 }
 java {
 	toolchain {

@@ -3,6 +3,7 @@ package ciomek.loon.commands;
 import ciomek.loon.mqtt.MQTTClient;
 import ciomek.loon.mqtt.payload.RegisterPayload;
 import ciomek.loon.mqtt.payload.RegisterResponse;
+import ciomek.loon.utils.PasswordHasher;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.ArgumentTypeString;
@@ -37,7 +38,9 @@ public class RegisterCommand implements CommandManager.CommandRegistry {
 										String internalUsername = ArgumentTypeString.getString(context, "internalUsername");
 										String password = ArgumentTypeString.getString(context, "password");
 
-										RegisterPayload payload = new RegisterPayload(player.uuid.toString(), password, internalUsername);
+										String hashedPassword = PasswordHasher.hash(password);
+
+										RegisterPayload payload = new RegisterPayload(player.uuid.toString(), hashedPassword, internalUsername);
 
 										MQTTClient.getInstance().publish(payload.topics().get(0), payload.toJson());
 
