@@ -35,21 +35,10 @@ public class RegisterCommand implements CommandManager.CommandRegistry {
 											return 0;
 										}
 
-										String internalUsername = ArgumentTypeString.getString(context, "internalUsername");
-										String password = ArgumentTypeString.getString(context, "password");
-
-										String hashedPassword = PasswordHasher.hash(password);
-
-										RegisterPayload payload = new RegisterPayload(player.uuid.toString(), hashedPassword, internalUsername);
-
-										MQTTClient.getInstance().publish(payload.topics().get(0), payload.toJson());
-
-										source.sendMessage("Sent request to the server! Waiting for the response. ");
-
-										MQTTClient.getInstance().subscribe("loon/register/+/response", (topic, message) -> {
+										MQTTClient.getInstance().subscribe("loon/auth/register/+/response", (topic, message) -> {
 											String[] parts = topic.split("/");
 
-											String playerUuid = parts[2];
+											String playerUuid = parts[3];
 
 											ObjectMapper objectMapper = new ObjectMapper();
 											RegisterResponse response = objectMapper.readValue(
@@ -69,6 +58,17 @@ public class RegisterCommand implements CommandManager.CommandRegistry {
 												source.sendMessage(response.error());
 											}
 										});
+
+										String internalUsername = ArgumentTypeString.getString(context, "internalUsername");
+										String password = ArgumentTypeString.getString(context, "password");
+
+										String hashedPassword = PasswordHasher.hash(password);
+
+										RegisterPayload payload = new RegisterPayload(player.uuid.toString(), hashedPassword, internalUsername);
+
+										MQTTClient.getInstance().publish(payload.topics().get(0), payload.toJson());
+
+										source.sendMessage("Sent request to the server! Waiting for the response. ");
 
 										return 1;
 									})

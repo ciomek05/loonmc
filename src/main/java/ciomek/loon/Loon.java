@@ -2,6 +2,7 @@ package ciomek.loon;
 
 import ciomek.loon.commands.ChangePasswordCommand;
 import ciomek.loon.commands.RegisterCommand;
+import ciomek.loon.commands.WebUsernameCommand;
 import ciomek.loon.mqtt.MQTTClient;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.core.net.command.CommandManager;
@@ -25,6 +26,7 @@ public class Loon implements ModInitializer {
 
 		CommandManager.registerCommand(new RegisterCommand());
 		CommandManager.registerCommand(new ChangePasswordCommand());
+		CommandManager.registerCommand(new WebUsernameCommand());
 
 		MQTTClient.getInstance();
 	}
