@@ -15,7 +15,7 @@ public record ServerInfoRequest() implements IRequest {
 		}
 
 		ServerInfoPayload payload = new ServerInfoPayload(
-			TPSTracker.getTPS(),
+			TPSTracker.getTPSRounded(),
 			server.getMinecraftVersion(),
 			domain,
 			server.motd,

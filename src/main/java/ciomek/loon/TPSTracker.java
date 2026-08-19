@@ -11,6 +11,11 @@ public class TPSTracker {
 		return tps;
 	}
 
+	public static double getTPSRounded()
+	{
+		return Math.round(tps * 10.0) / 10.0;
+	}
+
 	public static void setTPS(double tps)
 	{
 		TPSTracker.tps = tps;

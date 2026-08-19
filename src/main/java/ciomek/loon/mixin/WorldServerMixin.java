@@ -2,6 +2,7 @@ package ciomek.loon.mixin;
 
 import ciomek.loon.Loon;
 import ciomek.loon.TPSTracker;
+import ciomek.loon.mqtt.payload.ServerInfoPayload;
 import ciomek.loon.mqtt.payload.data.PlayerIdentity;
 import ciomek.loon.mqtt.payload.data.PositionData;
 import ciomek.loon.mqtt.payload.player.PlayerPositionPayload;
@@ -29,6 +30,9 @@ public class WorldServerMixin {
 	@Unique
 	private static final int POSITION_CHECK_INTERVAL_TICKS = 20;
 
+	@Unique
+	private static final int TPS_CHECK_INTERVAL_TICKS = 20;
+
 	@Shadow
 	public MinecraftServer mcServer;
 
@@ -48,12 +52,19 @@ public class WorldServerMixin {
 	private static int positionCheckTicks;
 
 	@Unique
+	private static int tpsCheckTicks;
+
+	@Unique
+	private static double lastTPS = 0;
+
+	@Unique
 	private static final Map<UUID, PositionData> lastSentPositions = new HashMap<>();
 
 	@Inject(method = "tick", at = @At("TAIL"))
 	private void onTick(CallbackInfo ci) {
 		countTicks();
 		positionCountdown();
+		tpsCountdown();
 		handleRequests();
 	}
 
@@ -97,6 +108,42 @@ public class WorldServerMixin {
 		if (++positionCheckTicks >= POSITION_CHECK_INTERVAL_TICKS) {
 			positionCheckTicks = 0;
 			broadcastMovedPlayerPositions();
+		}
+	}
+
+	@Unique private void tpsCountdown()
+	{
+		if (++tpsCheckTicks >= TPS_CHECK_INTERVAL_TICKS) {
+			tpsCheckTicks = 0;
+
+			double currentTPS = TPSTracker.getTPSRounded();
+
+			if (Math.round(lastTPS * 10) != currentTPS * 10) {
+				lastTPS = currentTPS;
+
+				WorldServer world = (WorldServer) (Object) this;
+				MinecraftServer server = world.mcServer;
+
+				String domain = System.getenv(Loon.EnvVarPrefix + "DOMAIN");
+				if (domain == null) {
+					domain = "";
+				}
+
+				ServerInfoPayload payload = new ServerInfoPayload(
+					TPSTracker.getTPSRounded(),
+					server.getMinecraftVersion(),
+					domain,
+					server.motd,
+					server.onlineMode,
+					server.sleepPercentage,
+					server.playerList.playerEntities.size(),
+					server.maxPlayers,
+					server.difficulty,
+					server.pvpOn,
+					server.viewDistance);
+
+				payload.send();
+			}
 		}
 	}
 
