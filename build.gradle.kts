@@ -57,17 +57,22 @@ dependencies {
 	localRuntime("org.lwjgl:lwjgl-stb::$lwjglNatives")
 
 	// MQTT
-	implementation("org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.2.5")
-	implementation("org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.2.5")
+	implementation(libs.pahoMqtt)
+	include(libs.pahoMqtt)
 
-	// JSON
-	implementation("com.fasterxml.jackson.core:jackson-databind:2.20.0")
-	implementation("com.fasterxml.jackson.core:jackson-databind:2.20.0")
-	implementation("com.fasterxml.jackson.core:jackson-core:2.20.0")
-	implementation("com.fasterxml.jackson.core:jackson-annotations:2.20")
+ 	// JSON
+	implementation(libs.jackson.databind)
+	include(libs.jackson.databind)
+
+	implementation(libs.jackson.core)
+	include(libs.jackson.core)
+
+	implementation(libs.jackson.annotations)
+	include(libs.jackson.annotations)
 
 	// Hashing
-	implementation("de.mkammerer:argon2-jvm:2.12")
+	implementation(libs.argon2)
+	include(libs.argon2)
 }
 java {
 	toolchain {
