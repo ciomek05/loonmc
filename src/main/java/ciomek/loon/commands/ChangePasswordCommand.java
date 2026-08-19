@@ -33,10 +33,11 @@ public class ChangePasswordCommand implements CommandManager.CommandRegistry {
 									return 0;
 								}
 
-								MQTTClient.getInstance().subscribe("loon/auth/register/+/response", (topic, message) -> {
-									String[] parts = topic.split("/");
+								String uuid = player.uuid.toString();
+								String responseTopic = "loon/auth/change_password/" + uuid + "/response";
 
-									String playerUuid = parts[3];
+								MQTTClient.getInstance().subscribe(responseTopic, (topic, message) -> {
+									MQTTClient.getInstance().unsubscribe(responseTopic);
 
 									ObjectMapper objectMapper = new ObjectMapper();
 									RegisterResponse response = objectMapper.readValue(
@@ -61,7 +62,7 @@ public class ChangePasswordCommand implements CommandManager.CommandRegistry {
 
 								String hashedPassword = PasswordHasher.hash(password);
 
-								ChangePasswordPayload payload = new ChangePasswordPayload(player.uuid.toString(), hashedPassword);
+								ChangePasswordPayload payload = new ChangePasswordPayload(uuid, hashedPassword);
 
 								MQTTClient.getInstance().publish(payload.topics().get(0), payload.toJson());
 

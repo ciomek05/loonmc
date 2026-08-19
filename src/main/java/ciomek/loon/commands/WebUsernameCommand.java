@@ -28,8 +28,11 @@ public class WebUsernameCommand implements CommandManager.CommandRegistry {
 						}
 
 						String uuid = player.uuid.toString();
+						String responseTopic = "loon/auth/show_username/" + uuid + "/response";
 
-						MQTTClient.getInstance().subscribe("loon/auth/show_username/" + uuid + "/response", (topic, message) -> {
+						MQTTClient.getInstance().subscribe(responseTopic, (topic, message) -> {
+							MQTTClient.getInstance().unsubscribe(responseTopic);
+
 							ObjectMapper objectMapper = new ObjectMapper();
 							ShowUsernameResponse response = objectMapper.readValue(
 								message.getPayload(),

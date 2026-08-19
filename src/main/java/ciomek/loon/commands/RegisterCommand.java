@@ -35,10 +35,11 @@ public class RegisterCommand implements CommandManager.CommandRegistry {
 											return 0;
 										}
 
-										MQTTClient.getInstance().subscribe("loon/auth/register/+/response", (topic, message) -> {
-											String[] parts = topic.split("/");
+										String uuid = player.uuid.toString();
+										String responseTopic = "loon/auth/register/" + uuid + "/response";
 
-											String playerUuid = parts[3];
+										MQTTClient.getInstance().subscribe(responseTopic, (topic, message) -> {
+											MQTTClient.getInstance().unsubscribe(responseTopic);
 
 											ObjectMapper objectMapper = new ObjectMapper();
 											RegisterResponse response = objectMapper.readValue(
@@ -64,7 +65,7 @@ public class RegisterCommand implements CommandManager.CommandRegistry {
 
 										String hashedPassword = PasswordHasher.hash(password);
 
-										RegisterPayload payload = new RegisterPayload(player.uuid.toString(), hashedPassword, internalUsername);
+										RegisterPayload payload = new RegisterPayload(uuid, hashedPassword, internalUsername);
 
 										MQTTClient.getInstance().publish(payload.topics().get(0), payload.toJson());
 

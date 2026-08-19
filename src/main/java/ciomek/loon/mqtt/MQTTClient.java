@@ -33,6 +33,14 @@ public class MQTTClient {
 		}
 	}
 
+	public void unsubscribe(String topicFilter) {
+		try {
+			client.unsubscribe(topicFilter);
+		} catch (MqttException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 	public void publish(String topic, String message, int qos) {
 		MqttMessage mqttMessage = new MqttMessage(message.getBytes());
 		mqttMessage.setQos(qos);
