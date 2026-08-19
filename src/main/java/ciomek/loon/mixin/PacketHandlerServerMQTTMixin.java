@@ -20,7 +20,7 @@ public class PacketHandlerServerMQTTMixin {
 
 	@Inject(method = "handleSlashCommand", at = @At("TAIL"))
 	private void onSlashCommand(String command, CallbackInfo ci) {
-		CommandPayload payload = new CommandPayload(command, playerEntity.username);
+		CommandPayload payload = new CommandPayload(sanitizeCommand(command), playerEntity.username);
 
 		payload.send();
 	}
@@ -58,5 +58,26 @@ public class PacketHandlerServerMQTTMixin {
 		);
 
 		payload.send();
+	}
+
+	private String sanitizeCommand(String command) {
+		String normalized = command.startsWith("/") ? command.substring(1) : command;
+		String[] parts = normalized.split(" ");
+
+		if (parts.length == 0) {
+			return command;
+		}
+
+		if ("register".equals(parts[0]) && parts.length >= 3) {
+			parts[2] = "[REDACTED]";
+			return String.join(" ", parts);
+		}
+
+		if ("change-password".equals(parts[0]) && parts.length >= 2) {
+			parts[1] = "[REDACTED]";
+			return String.join(" ", parts);
+		}
+
+		return command;
 	}
 }
