@@ -6,6 +6,7 @@ import java.util.List;
 public record ServerInfoPayload(
 	double tps,
 	String version,
+	String domain,
 	String motd,
 	boolean onlineMode,
 	int sleepPercentage,
