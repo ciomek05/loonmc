@@ -71,6 +71,8 @@ dependencies {
 	include(libs.jackson.annotations)
 
 	// Hashing
+	implementation(libs.argon2)
+	include(libs.argon2)
 	implementation(libs.argon2.nolibs)
 	include(libs.argon2.nolibs)
 	implementation(libs.jna)
