@@ -37,6 +37,7 @@ pahoMqtt = "1.2.5"
 jackson = "2.22.1"
 jacksonAnnotations = "2.22"
 argon2 = "2.12"
+jna = "5.16.0"
 ##########################################################################
 
 [libraries]
@@ -60,6 +61,8 @@ jackson-databind = { group = "com.fasterxml.jackson.core", name = "jackson-datab
 jackson-core = { group = "com.fasterxml.jackson.core", name = "jackson-core", version.ref = "jackson" }
 jackson-annotations = { group = "com.fasterxml.jackson.core", name = "jackson-annotations", version.ref = "jacksonAnnotations" }
 argon2 = { group = "de.mkammerer", name = "argon2-jvm", version.ref = "argon2" }
+argon2-nolibs = { group = "de.mkammerer", name = "argon2-jvm-nolibs", version.ref = "argon2" }
+jna = { group = "net.java.dev.jna", name = "jna", version.ref = "jna" }
 
 [bundles]
 btaLwjgl = [ "lwjgl", "lwjgl-glfw", "lwjgl-openal", "lwjgl-opengl", "lwjgl-stb", "legacyLwjgl" ]
