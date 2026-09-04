@@ -93,6 +93,7 @@ public class MQTTClient {
 						client.subscribe("loon/player/+/position/request");
 						client.subscribe("loon/world/chunks/+/+/request");
 						client.subscribe("loon/server/info/request");
+						client.subscribe("loon/playerlist/sync/request");
 
 						if (reconnect)
 							Loon.LOGGER.info("MQTT reconnected");
@@ -174,6 +175,10 @@ public class MQTTClient {
 
 					if (topic.equals("loon/server/info/request")) {
 						RequestManager.addRequest(new ServerInfoRequest());
+					}
+
+					if (topic.equals("loon/playerlist/sync/request")) {
+						RequestManager.addRequest(new PlayerListSyncRequest());
 					}
 				}
 
